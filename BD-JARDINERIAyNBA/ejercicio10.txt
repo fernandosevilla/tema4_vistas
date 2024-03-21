@@ -1,0 +1,21 @@
+1. CREATE USER "Fer"@"192.168.1.10" IDENTIFIED BY "usuadmin";
+
+2. GRANT SELECT ON jardineria.* TO "Fer"@"192.168.1.10";
+
+3. SHOW GRANTS;
+
+4. REVOKE ALL PRIVILEGES ON *.* FROM "Fer"@"192.168.1.10";
+
+5. CREATE DATABASE NuevaBD;
+   GRANT CREATE TABLE ON NuevaBD.* TO "Fer"@"192.168.1.10";
+
+6. mysql -u Fer -h 192.168.1.10 -p
+   CREATE TABLE testTabla (
+       id INT AUTO_INCREMENT PRIMARY KEY,
+       nombre VARCHAR(255)
+   );
+   No se puede ver la informacion porque el usuario Fer solo tiene permisos para crear tablas en esta base de datos
+
+7. DROP USER "Fer"@"192.168.1.10";
+
+8. SHOW GRANTS FOR "juan"@"localhost";
