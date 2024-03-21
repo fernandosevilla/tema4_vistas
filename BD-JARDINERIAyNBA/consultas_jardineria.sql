@@ -50,10 +50,10 @@ SELECT * FROM PEDIDOSCLIENTES;
 -- 5 Diseñar una VISTA(MEJORCLIxOFICINA) con los siguientes datos, es decir de cada OFICINA debemos obtener
 -- el mejor cliente del año 2009(en base al importe de sus pedidos):
 -- CODIGOOFICINA,CIUDAD,PAIS, CODCLI,NOMCLI, IMPORTEPEDIDOS(en Euros y con 2 decimales)
+-- FALTA ARREGLARLO
 CREATE OR REPLACE VIEW MEJORCLIXOFICINA AS
-SELECT o.CodigoOficina, o.ciudad, o.pais, 
-       c.CodigoCliente, c.NombreCliente, 
-       CONCAT(ROUND(SUM(dp.Cantidad * dp.PrecioUnidad), 2), "€") AS ImportePedidos
+SELECT o.CodigoOficina, o.ciudad, o.pais, c.CodigoCliente, c.NombreCliente, 
+CONCAT(ROUND(SUM(dp.Cantidad * dp.PrecioUnidad), 2), "€") AS ImportePedidos
 FROM oficinas o
 JOIN empleados e ON o.CodigoOficina = e.CodigoOficina
 JOIN clientes c ON e.CodigoEmpleado = c.CodigoEmpleadoRepVentas
@@ -68,11 +68,8 @@ HAVING ImportePedidos = (
     WHERE p.CodigoCliente = c.CodigoCliente
     GROUP BY p.CodigoCliente
     ORDER BY ImporteTotal DESC
-    LIMIT 1
-)
-
+    LIMIT 1)
 ORDER BY o.pais, o.ciudad, ImportePedidos DESC;
-
 
 SELECT * FROM MEJORCLIXOFICINA;
 
