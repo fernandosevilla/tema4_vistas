@@ -1,0 +1,23 @@
+1. CREATE USER "paco"@"localhost" IDENTIFIED BY "usuadmin";
+
+2. CREATE USER "juan"@"localhost" IDENTIFIED BY "usuadmin";
+   GRANT USAGE ON *.* TO "juan"@"localhost";
+
+3. GRANT SELECT ON jardineria.Clientes TO "paco"@"localhost";
+
+4. GRANT SELECT, INSERT, UPDATE ON jardineria.* TO "juan"@"localhost";
+
+5. mysql -u juan -p
+   GRANT SELECT ON jardineria.Empleados TO "paco"@"localhost";
+
+6. REVOKE SELECT ON jardineria.Clientes FROM "paco"@"localhost";
+
+7. mysql -u root -p
+   REVOKE ALL PRIVILEGES ON *.* FROM "paco"@"localhost";
+   REVOKE ALL PRIVILEGES ON *.* FROM "juan"@"localhost";
+
+8. GRANT SELECT (CodigoOficina, Ciudad) ON jardineria.Oficinas TO "juan"@"localhost";
+
+9. mysql -u juan -p
+   SELECT CodigoOficina, Ciudad FROM jardineria.Oficinas;
+10. DROP USER "paco"@"localhost";
