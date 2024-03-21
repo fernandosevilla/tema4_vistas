@@ -51,24 +51,76 @@ SELECT * FROM PEDIDOSCLIENTES;
 -- el mejor cliente del año 2009(en base al importe de sus pedidos):
 -- CODIGOOFICINA,CIUDAD,PAIS, CODCLI,NOMCLI, IMPORTEPEDIDOS(en Euros y con 2 decimales)
 CREATE OR REPLACE VIEW MEJORCLIXOFICINA AS
-SELECT o.CodigoOficina, o.ciudad, o.pais, c.CodigoCliente, c.NombreCliente, 
-CONCAT(ROUND(SUM(dp.Cantidad * dp.PrecioUnidad)), "€") AS ImportePedidos
-FROM oficinas o, detallepedidos dp
-RIGHT JOIN empleados e ON e.CodigoOficina = o.CodigoOficina
-INNER JOIN clientes c ON c.CodigoEmpleadoRepVentas = e.CodigoEmpleado
-INNER JOIN pedidos p ON p.CodigoCliente = c.CodigoCliente
-WHERE YEAR (p.FechaPedido) = 2009
-HAVING ImportePedidos = (SELECT CONCAT(ROUND(SUM(dp.Cantidad * dp.PrecioUnidad)), "€")
-						
-						
-                        
+SELECT o.CodigoOficina, o.ciudad, o.pais, 
+       c.CodigoCliente, c.NombreCliente, 
+       CONCAT(ROUND(SUM(dp.Cantidad * dp.PrecioUnidad), 2), "€") AS ImportePedidos
+FROM oficinas o
+JOIN empleados e ON o.CodigoOficina = e.CodigoOficina
+JOIN clientes c ON e.CodigoEmpleado = c.CodigoEmpleadoRepVentas
+JOIN pedidos p ON c.CodigoCliente = p.CodigoCliente
+JOIN detallepedidos dp ON p.CodigoPedido = dp.CodigoPedido
+WHERE YEAR(p.FechaPedido) = 2009
+GROUP BY o.CodigoOficina, c.CodigoCliente
+HAVING ImportePedidos = (
+    SELECT CONCAT(ROUND(SUM(dp.Cantidad * dp.PrecioUnidad), 2), "€") AS ImporteTotal
+    FROM pedidos p
+    JOIN detallepedidos dp ON p.CodigoPedido = dp.CodigoPedido
+    WHERE p.CodigoCliente = c.CodigoCliente
+    GROUP BY p.CodigoCliente
+    ORDER BY ImporteTotal DESC
+    LIMIT 1
+)
+
+ORDER BY o.pais, o.ciudad, ImportePedidos DESC;
 
 
+SELECT * FROM MEJORCLIXOFICINA;
 
+-- 6 Diseñar una VISTA(RANKING_PRODUCTOS) con los siguientes datos(NOTA IMPORTANTE: en esta vista deben
+-- salir todos los productos, los 276 productos¡¡):
+-- ARTICULO(CODIGOPRODUCTO,GAMA,NOMBRE),CANTIDAD,IMPORTEPEDIDOS(en Euros y con 2 decimales),
+-- PORC_PEDIDOS(en base al importe, 0 decimales y con el símbolo %)
+-- Ordenados por importe de mayor a menor.
+CREATE OR REPLACE VIEW RANKING_PRODUCTOS AS
+SELECT p.CodigoProducto, p.Gama, p.Nombre, SUM(dp.cantidad) AS Cantidad, 
+CONCAT(ROUND(SUM(dp.Cantidad * dp.PrecioUnidad), 2), "€") AS ImportePedidos,
+CONCAT(ROUND(SUM(dp.Cantidad * dp.PrecioUnidad) * 100 / (SELECT SUM(Cantidad * PrecioUnidad) FROM detallepedidos), 2), "%") AS PORC_PEDIDOS
+FROM pedidos ped
+INNER JOIN detallepedidos dp ON dp.CodigoPedido = ped.CodigoPedido
+RIGHT JOIN productos p ON p.CodigoProducto = dp.CodigoProducto
+GROUP BY p.CodigoProducto
+ORDER BY SUM(dp.Cantidad * dp.PrecioUnidad) DESC; 
 
+SELECT * FROM RANKING_PRODUCTOS;
 
+-- 7 Diseñar una VISTA(VISTAJEFES) de tal forma que nos salgan los jefes y los empleados que tienen a su cargo
+-- con los siguientes datos:
+-- CODIGOOFICINA,PUESTO(del Jefe), CODIGOJEFE, NOMBREyAPELLIDOSdelJEFE, CODIGOEMPLEADO,
+-- NOMBREyAPELLIDOS(del empleado y PUESTO (del empleado(s) a su cargo)
+-- Ordenados por jefe y empleado
+CREATE OR REPLACE VIEW VISTAJEFES AS
+SELECT e.CodigoOficina, e.Puesto AS PuestoJefe, e.CodigoJefe,
+CONCAT(e.Nombre, " ", e.Apellido1, " ", e.Apellido2) AS DatosJefe,
+e2.CodigoEmpleado,
+CONCAT(e2.Nombre, " ", e2.Apellido1, " ", e2.Apellido2) AS DatosEmpleado,
+e2.Puesto
+FROM empleados e, empleados e2
+WHERE e.CodigoEmpleado = e2.CodigoJefe
+ORDER BY e.CodigoJefe, e2.CodigoEmpleado;
 
+SELECT * FROM VISTAJEFES;
 
+-- 8 Diseñar ahora una VISTA similar a la anterior(VISTAEMPLEADOS-JEFE) de tal forma que nos salgan los todos
+-- los empleados y su jefe con los siguientes datos:
+-- DATOSdelEMPLEADO(código, nombre, apellidos,puesto) y DATOSdelJEFE(código, nombre, apellidos,puesto)
+-- Ordenados por jefe y empleados
+CREATE OR REPLACE VIEW VISTAEMPLEADOS_JEFE AS
+SELECT CONCAT(e.CodigoEmpleado, " ", e.Nombre, " ", e.Apellido1, " ", e.Apellido2) AS DatosEmpleado,
+e.Puesto AS PuestoEmpleado,
+CONCAT(e2.CodigoJefe, " ", e2.Nombre, " ", e2.Apellido1, " ", e2.Apellido2) AS DatosJefe,
+e2.Puesto AS PuestoJefe
+FROM empleados e, empleados e2
+WHERE e.CodigoJefe = e2.CodigoEmpleado
+ORDER BY DatosJefe, DatosEmpleado;
 
-
-
+SELECT * FROM VISTAEMPLEADOS_JEFE;
