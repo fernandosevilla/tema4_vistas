@@ -1,15 +1,11 @@
 SET GLOBAL log_bin_trust_function_creators=1;
-DROP PROCEDURE IF EXISTS CalifIF;
-DROP FUNCTION IF EXISTS Calificacion1;
-DROP PROCEDURE IF EXISTS VerifCli;
-DROP FUNCTION IF EXISTS ExistCli;
-DROP FUNCTION IF EXISTS pedido;
-DROP FUNCTION IF EXISTS par2;
-DROP PROCEDURE IF EXISTS par;
-DROP FUNCTION IF EXISTS hola3;
-DROP FUNCTION IF EXISTS hola2;
-DROP PROCEDURE IF EXISTS hola;
 
+-- ------------------------------------------------------------------
+-- PRACTICA 3
+-- ------------------------------------------------------------------
+
+-- 1
+DROP PROCEDURE IF EXISTS hola;
 DELIMITER $$
 CREATE PROCEDURE hola ()
 BEGIN
@@ -19,8 +15,10 @@ BEGIN
     SELECT texto;
 END
 $$
+CALL hola();
 
-
+-- 2
+DROP FUNCTION IF EXISTS hola2;
 DELIMITER $$
 CREATE FUNCTION hola2() RETURNS VARCHAR(50)
 BEGIN
@@ -30,14 +28,20 @@ BEGIN
     RETURN texto2;
 END
 $$
+SELECT hola2();
 
+-- 3
+DROP FUNCTION IF EXISTS hola3;
 DELIMITER $$
 CREATE FUNCTION hola3(texto3 VARCHAR(50)) RETURNS VARCHAR(50)
 BEGIN
     RETURN texto3;
 END
 $$
+SELECT hola3("Imprime esto");
 
+-- 4
+DROP PROCEDURE IF EXISTS par;
 DELIMITER $$
 CREATE PROCEDURE par(numero INT)
 BEGIN
@@ -50,7 +54,10 @@ BEGIN
     SELECT texto;
 END
 $$
+CALL par(5);
 
+-- 5
+DROP FUNCTION IF EXISTS par2;
 DELIMITER $$
 CREATE FUNCTION par2(numero INT) RETURNS VARCHAR(50)
 BEGIN
@@ -63,18 +70,39 @@ BEGIN
     RETURN texto;
 END
 $$
-
-CALL hola();
-SELECT hola2();
-SELECT hola3("Imprime esto");
-CALL par(5);
 SELECT par2(6);
+
+-- 6
+DROP PROCEDURE IF EXISTS CuentaLetras;
+DELIMITER $$
+CREATE PROCEDURE CuentaLetras(texto VARCHAR(50))
+BEGIN
+	DECLARE contador VARCHAR(100);
+    SET contador = length(texto);
+    
+    SELECT contador;
+END
+$$
+CALL CuentaLetras("asdkfnajsdkfjasdfasdjñfa asdl kasdjf askf asd");
+
+-- 7
+DROP FUNCTION IF EXISTS CuentaDigitos;
+DELIMITER $$
+CREATE FUNCTION CuentaDigitos(numero INT) RETURNS VARCHAR(50)
+BEGIN
+	DECLARE contador VARCHAR(100);
+    SET contador = length(numero);
+    
+	RETURN contador;
+END
+$$
+SELECT CuentaDigitos(2222);
 
 -- ------------------------------------------------------------------
 -- PRACTICA 3
 -- ------------------------------------------------------------------
 -- 3
-
+DROP FUNCTION IF EXISTS pedido;
 DELIMITER $$
 CREATE FUNCTION pedido() RETURNS INT
 BEGIN
@@ -89,6 +117,7 @@ $$
 SELECT pedido();
 
 -- 4
+DROP FUNCTION IF EXISTS ExistCli;
 DELIMITER $$
 CREATE FUNCTION ExistCli(IdClente INT) RETURNS INT
 BEGIN
@@ -110,6 +139,7 @@ $$
 SELECT ExistCli(600);
 
 -- 5
+DROP PROCEDURE IF EXISTS VerifCli;
 DELIMITER $$
 CREATE PROCEDURE VerifCli ()
 BEGIN
@@ -132,6 +162,7 @@ $$
 CALL VerifCli();
 
 -- 6
+DROP FUNCTION IF EXISTS Calificacion1;
 DELIMITER $$
 CREATE FUNCTION Calificacion1 (nota INT) RETURNS VARCHAR(100)
 BEGIN
@@ -150,6 +181,7 @@ $$
 SELECT Calificacion1(8);
 
 -- 7 
+DROP PROCEDURE IF EXISTS CalifIF;
 DELIMITER $$
 CREATE PROCEDURE CalifIF (nota INT)
 BEGIN
@@ -175,9 +207,93 @@ $$
 
 CALL CALIFIF(9);
 
+-- 8
+DROP FUNCTION IF EXISTS Suma100;
+DELIMITER $$
+CREATE FUNCTION Suma100() RETURNS INT
+BEGIN
+	DECLARE numero INT DEFAULT 0;
+    DECLARE contador INT DEFAULT 1;
+	bucle: LOOP
+		SET numero = numero + contador;
+		SET contador = contador + 1;
+        
+        IF contador <= 100 THEN
+			ITERATE bucle;
+		END IF;
+        LEAVE bucle;
+    END LOOP bucle;
+    
+    RETURN numero;
+END
+$$
+SELECT Suma100();
 
+-- 9
+DROP PROCEDURE IF EXISTS SumaX;
+DELIMITER $$
+CREATE PROCEDURE SumaX(numero INT)
+BEGIN
+	DECLARE aux INT DEFAULT 0;
+    DECLARE contador INT DEFAULT 0;
+    
+    bucle: WHILE contador <= numero DO
+		SET aux = aux + contador;
+		SET contador = contador + 1;
+    END WHILE;
+    
+    SELECT aux;
+END
+$$
 
+CALL SumaX(100);
 
+-- 10
+DROP PROCEDURE IF EXISTS Factorial;
+DELIMITER $$
+CREATE PROCEDURE Factorial(numero INT)
+BEGIN
+	DECLARE aux INT DEFAULT 1;
+    DECLARE contador INT DEFAULT 1;
+    
+    REPEAT 
+		SET aux = aux * contador;
+		SET contador = contador + 1;
+    UNTIL contador >= numero
+    END REPEAT;
+    
+    SELECT aux;
+END
+$$
+
+CALL Factorial(5);
+
+-- 11
+DROP PROCEDURE IF EXISTS Quiniela;
+DELIMITER $$
+CREATE PROCEDURE Quiniela()
+BEGIN
+    DECLARE numRandom INT;
+    DECLARE numRandomConvertido CHAR(1);
+    
+    SET numRandom = TRUNCATE(RAND() * 3, 0);
+    SET numRandomConvertido = CONVERT(numRandom, CHAR);
+	
+	IF numRandomConvertido = "1" THEN
+		SET numRandomConvertido = "1";
+	ELSEIF numRandomConvertido = "2" THEN
+		SET numRandomConvertido = "2";
+	ELSE
+		SET numRandomConvertido = "X";
+	END IF;
+    
+    
+    
+    SELECT numRandomConvertido;
+END
+$$
+
+CALL Quiniela();
 
 
 
