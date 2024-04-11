@@ -227,6 +227,7 @@ BEGIN
     RETURN numero;
 END
 $$
+
 SELECT Suma100();
 
 -- 9
@@ -273,29 +274,152 @@ DROP PROCEDURE IF EXISTS Quiniela;
 DELIMITER $$
 CREATE PROCEDURE Quiniela()
 BEGIN
-    DECLARE numRandom INT;
-    DECLARE numRandomConvertido CHAR(1);
+	DECLARE numRandom INT;
+	DECLARE numRandomConvertido CHAR(1);
+    DECLARE contador INT DEFAULT 0;
+    DECLARE resultado VARCHAR(255);
     
-    SET numRandom = TRUNCATE(RAND() * 3, 0);
-    SET numRandomConvertido = CONVERT(numRandom, CHAR);
-	
-	IF numRandomConvertido = "1" THEN
-		SET numRandomConvertido = "1";
-	ELSEIF numRandomConvertido = "2" THEN
-		SET numRandomConvertido = "2";
-	ELSE
-		SET numRandomConvertido = "X";
-	END IF;
+    SET resultado = "Resultado: ";
     
+    WHILE contador < 14 DO
+		SET numRandom = TRUNCATE(RAND() * 3, 0);
+		SET numRandomConvertido = CONVERT(numRandom, CHAR);
+		
+		IF numRandomConvertido = "1" THEN
+			SET numRandomConvertido = "1";
+		ELSEIF numRandomConvertido = "2" THEN
+			SET numRandomConvertido = "2";
+		ELSE
+			SET numRandomConvertido = "X";
+		END IF;
+		
+		SET resultado = CONCAT(resultado, numRandomConvertido, " ");
+		SET contador = contador + 1;
+    END WHILE;
     
-    
-    SELECT numRandomConvertido;
+    SELECT resultado;
 END
 $$
 
 CALL Quiniela();
 
+-- 12
+DROP FUNCTION IF EXISTS QuinielaF;
+DELIMITER $$
+CREATE FUNCTION QuinielaF() RETURNS VARCHAR(100)
+BEGIN
+	DECLARE numRandom INT;
+	DECLARE numRandomConvertido CHAR(1);
+    DECLARE contador INT DEFAULT 0;
+    DECLARE resultado VARCHAR(255);
+    
+    SET resultado = "Resultado: ";
+    
+    WHILE contador < 14 DO
+		SET numRandom = TRUNCATE(RAND() * 3, 0);
+		SET numRandomConvertido = CONVERT(numRandom, CHAR);
+		
+		IF numRandomConvertido = "1" THEN
+			SET numRandomConvertido = "1";
+		ELSEIF numRandomConvertido = "2" THEN
+			SET numRandomConvertido = "2";
+		ELSE
+			SET numRandomConvertido = "X";
+		END IF;
+		
+		SET resultado = CONCAT(resultado, numRandomConvertido, " ");
+		SET contador = contador + 1;
+    END WHILE;
+    
+    RETURN resultado;
+END
+$$
 
+SELECT QuinielaF();
 
+-- 13 y 14
+DROP PROCEDURE IF EXISTS MultiQuiniela;
+DELIMITER $$
+CREATE PROCEDURE MultiQuiniela(columnas INT)
+BEGIN
+    DECLARE contador INT DEFAULT 1;
+    DECLARE resultado VARCHAR(255);
+    
+    WHILE contador <= columnas DO
+        SET resultado = CONCAT("COLUMNA ", contador, ": ", QuinielaF());
+        SELECT resultado;
+        SET contador = contador + 1;
+    END WHILE;
+    
+END
+$$
+
+CALL MultiQuiniela(3);
+
+-- 15
+DROP PROCEDURE IF EXISTS Primitiva;
+DELIMITER $$
+CREATE PROCEDURE Primitiva()
+BEGIN
+	DECLARE numRandom INT;
+	DECLARE numRandomConvertido CHAR(2);
+	DECLARE contador INT DEFAULT 1;
+    DECLARE resultado VARCHAR(100);
+    SET resultado = "RESULTADO: ";
+    
+    WHILE contador <= 6 DO
+		SET numRandom = TRUNCATE(RAND() * 50, 0);
+        SET numRandomConvertido = CONVERT(numRandom, CHAR);
+        SET resultado = CONCAT(resultado, numRandomConvertido, " ");
+		SET contador = contador + 1;
+	END WHILE;
+	
+    SELECT resultado;
+END
+$$
+
+CALL Primitiva();
+
+-- 16
+DROP FUNCTION IF EXISTS PrimitivaF;
+DELIMITER $$
+CREATE FUNCTION PrimitivaF() RETURNS VARCHAR(100)
+BEGIN
+	DECLARE numRandom INT;
+	DECLARE numRandomConvertido CHAR(2);
+	DECLARE contador INT DEFAULT 1;
+    DECLARE resultado VARCHAR(100);
+    SET resultado = "RESULTADO: ";
+    
+    WHILE contador <= 6 DO
+		SET numRandom = TRUNCATE(RAND() * 50, 0);
+        SET numRandomConvertido = CONVERT(numRandom, CHAR);
+        SET resultado = CONCAT(resultado, numRandomConvertido, " ");
+		SET contador = contador + 1;
+	END WHILE;
+	
+    RETURN resultado;
+END
+$$
+
+SELECT PrimitivaF();
+
+-- 17
+DROP PROCEDURE IF EXISTS MultiPrimitiva;
+DELIMITER $$
+CREATE PROCEDURE MultiPrimitiva(columnas INT)
+BEGIN
+	DECLARE contador INT DEFAULT 1;
+    DECLARE resultado VARCHAR(255);
+    
+    WHILE contador <= columnas DO
+        SET resultado = CONCAT("COLUMNA ", contador, ": ", PrimitivaF());
+        SELECT resultado;
+        SET contador = contador + 1;
+    END WHILE;
+END
+$$
+
+CALL MultiPrimitiva(3);
 
 
