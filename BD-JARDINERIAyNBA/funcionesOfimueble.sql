@@ -46,6 +46,76 @@ $$
 SELECT ventas();
 
 -- 4
+DROP PROCEDURE IF EXISTS zonaCliente;
+DELIMITER $$
+CREATE PROCEDURE zonaCliente(codigoCliente INT)
+BEGIN
+	DECLARE codAux INT;
+    DECLARE nombrePersona VARCHAR(100);
+    DECLARE zona VARCHAR(100);
+    DECLARE resultado VARCHAR(250);
+    
+    SET codAux = codigoCliente;
+    SET nombrePersona = (SELECT nombre FROM clientes
+						WHERE CODIGO = codAux);
+    SET zona = (SELECT z.nombre FROM zonas z
+				INNER JOIN provincias prov ON prov.CODZONA = z.CODIGO
+                INNER JOIN poblaciones plob ON plob.PROVINCIA = prov.PROVINCIA
+                INNER JOIN oficinas o ON o.POBLACION = plob.POBLACION
+                INNER JOIN clientes cli ON cli.CODOFIC = o.CODIGO
+                WHERE cli.CODIGO = codAux);
+                
+    SET resultado = CONCAT("El cliente numero ", codAux, " ", nombrePersona, " pertenece a la zona de ", zona);
+    
+    SELECT resultado;
+END
+$$
+
+CALL zonaCliente(2);
+
+-- 5
+DROP FUNCTION IF EXISTS datosProducto;
+DELIMITER $$
+CREATE FUNCTION datosProducto(codProducto INT) RETURNS VARCHAR(200)
+BEGIN
+    DECLARE codAux INT;
+    DECLARE descProd VARCHAR(100);
+    DECLARE cantidadVendida INT;
+    DECLARE precioUnidad INT;
+    DECLARE importeTotal INT;
+    DECLARE resultado VARCHAR(200);
+
+    SET codAux = codProducto;
+
+    -- Obtener la descripción del producto
+    SET descProd = (SELECT descripcion FROM productos WHERE codigo = codAux);
+
+    -- Obtener la cantidad vendida sumando el campo noventa de lineasventa
+    SELECT SUM(LV.ctd) INTO cantidadVendida
+    FROM lineasventa lv
+    WHERE lv.codprod = codAux;
+
+    -- Obtener el precio por unidad del producto
+    SET precioUnidad = (SELECT PVP FROM productos WHERE codigo = codAux);
+
+    -- Calcular el importe total
+    SET importeTotal = cantidadVendida * precioUnidad;
+
+    -- Construir el resultado
+    SET resultado = CONCAT("PRODUCTO: ", codAux, " ", descProd, " CANTIDADVENDIDA: ",
+					cantidadVendida, " PVP_UNIDAD: ", precioUnidad,
+                    " IMPORTE: ", importeTotal, "€");
+
+    RETURN resultado;
+END
+$$
+
+SELECT datosProducto(3);
+
+-- 6
+
+
+
 
 
 
