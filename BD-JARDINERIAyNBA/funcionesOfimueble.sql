@@ -113,6 +113,43 @@ $$
 SELECT datosProducto(3);
 
 -- 6
+DROP FUNCTION IF EXISTS StockXGama;
+DELIMITER $$
+CREATE FUNCTION StockXGama(nombre VARCHAR(200)) RETURNS VARCHAR(100) READS SQL DATA
+BEGIN
+	DECLARE resultado VARCHAR(100);
+    DECLARE stock INT;
+    
+    SELECT SUM(EXISTENCIAS) INTO stock
+		FROM productos
+        WHERE descripcion = nombre;
+    
+	SET resultado = CONCAT(nombre, ": ", stock);
+    
+    RETURN resultado;
+END
+$$
+
+SELECT StockXGama("MESA");
+
+-- 7
+DROP PROCEDURE IF EXISTS importeVentas;
+DELIMITER $$
+CREATE PROCEDURE importeVentas()
+BEGIN
+	
+END
+$$
+
+
+
+
+
+
+
+
+
+
 
 
 
