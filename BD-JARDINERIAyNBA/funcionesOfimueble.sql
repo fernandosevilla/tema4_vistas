@@ -137,13 +137,56 @@ DROP PROCEDURE IF EXISTS importeVentas;
 DELIMITER $$
 CREATE PROCEDURE importeVentas()
 BEGIN
-	
+    
+    DECLARE inicio, fin, importeNuevo INT;
+	SELECT min(NOVENTA) INTO inicio FROM Ventas;
+    SELECT max(NOVENTA) INTO fin FROM Ventas;
+    
+    WHILE inicio <= fin DO
+		SELECT sum(lv.ctd * pr.PVP) INTO importeNuevo FROM ventas v, lineasventa lv, productos pr
+			WHERE pr.CODIGO = lv.CODPROD
+            AND lv.NOVENTA = v.NOVENTA
+            AND lv.NOVENTA = inicio
+			GROUP BY lv.noventa;
+            
+            UPDATE ventas
+            SET IMPORTE = importeNuevo
+            WHERE NOVENTA = inicio;
+            
+            SET inicio = inicio + 1;
+    END WHILE;
+    
+    SELECT "REALIZADO";
 END
 $$
 
+CALL importeVentas();
 
-
-
+-- 8
+DROP FUNCTION IF EXISTS numeroVentas;
+DELIMITER $$
+CREATE FUNCTION numeroVentas() RETURNS VARCHAR(50)
+BEGIN
+	DECLARE inicio, fin, numVentaNuevo INT;
+    
+	SELECT MIN(NOVENTA) INTO inicio FROM Ventas;
+	SELECT MAX(NOVENTA) INTO fin FROM Ventas;
+    
+    WHILE inicio <= fin DO
+		SELECT COUNT(lv.NOVENTA) INTO numVentaNuevo
+        FROM ventas v, lineasventa lv, poblaciones pob, oficinas o, clientes cl
+			WHERE pob.poblacion = o.poblacion
+            AND o.codigo = cl.codofic
+            AND cl.codigo = v.codcli
+            AND v.noventa = lv.noventa
+            GROUP BY lv.noventa;
+            
+			UPDATE poblaciones
+            SET NUMVENTAS = numVentaNuevo
+            WHERE ;
+	END WHILE;
+END
+$$
 
 
 
