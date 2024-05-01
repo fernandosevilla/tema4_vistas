@@ -180,18 +180,32 @@ BEGIN
             AND cl.codigo = v.codcli
             AND v.noventa = lv.noventa
             GROUP BY lv.noventa;
+
             
-			UPDATE poblaciones
-            SET NUMVENTAS = numVentaNuevo
-            WHERE ;
+			UPDATE poblacion
+			SET NUMVENTAS = numVentaNuevo;
+            
+            SET inicio = inicio + 1;
 	END WHILE;
+    
+    RETURN "REALIZADO";
 END
 $$
 
+SELECT numeroVentas();
 
+-- 9
+DROP PROCEDURE IF EXISTS importeProvs;
+DELIMITER $$
+CREATE PROCEDURE importeProvs()
+BEGIN
+	
+END
+$$
 
+CALL importeProvs();
 
-
+-- 10
 
 
 
